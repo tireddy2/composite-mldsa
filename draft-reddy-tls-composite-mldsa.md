@@ -165,7 +165,9 @@ Ed25519 and Ed448 ensure SUF security, which may remain secure even if ML-DSA is
 emerge. Applications that prioritize SUF security may benefit from using them in composite with ML-DSA to
 mitigate risks if ML-DSA is eventually broken.
 
-TLS clients that support both post-quantum and traditional-only signature algorithms are vulnerable to downgrade attacks. In such a scenario, an attacker with access to a CRQC could forge a traditional server certificate, thereby impersonating the server. If the client accepts traditional-only certificates, it will be exposed to this risk. To mitigate such attacks, clients SHOULD enforce a policy to reject traditional-only certificates once post-quantum or composite authentication is broadly deployed and the need to interoperate with legacy servers has passed. In the interim, accepting traditional-only certificates remains necessary for compatibility with the existing ecosystem, where many servers have not yet upgraded to PQ or composite authentication mechanisms. 
+TLS clients that support both post-quantum and traditional-only signature algorithms are vulnerable to downgrade attacks. In such a scenario, an attacker with access to a CRQC could forge a traditional server certificate, thereby impersonating the server. If the client accepts traditional-only certificates for backward compatibility, it will be exposed to this risk. 
+
+While the widespread deployment of composite or post-quantum certificates will reduce exposure, clients remain vulnerable unless they enforce stricter authentication policies. A coordinated "flag day" in which all traditional-only certificates are simultaneously phased out across the ecosystem is highly unlikely, due to real-world deployment constraints. To address this deployment challenge, implementations MAY adopt a strategy to allow clients to cache a server's support for composite or PQ certificates, similar to the HTTP Strict Transport Security (HSTS) mechanism. Once a client observes a server presenting a composite or PQ certificate, it could remember it and reject fallback to traditional-only authentication in future connections to that server. 
 
 # IANA Considerations
 
@@ -197,4 +199,5 @@ IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs1_sh
 # Acknowledgments
 {:numbered="false"}
 
-Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing and Sean Turner for the discussion and comments.
+Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, 
+Yaron Sheffer and Sean Turner for the discussion and comments.
