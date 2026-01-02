@@ -109,22 +109,22 @@ This document adds new SignatureSchemes types for the composite ML-DSA as follow
 
 ~~~
 enum {
-  mldsa44_ecdsa_secp256r1_sha256 (0x0907),
-  mldsa65_ecdsa_secp384r1_sha384 (0x0908),
-  mldsa87_ecdsa_secp384r1_sha384 (0x0909),
-  mldsa44_ed25519 (0x090A),
-  mldsa65_ed25519 (0x090B),
-  mldsa44_rsa2048_pkcs1_sha256 (0x090C),
-  mldsa65_rsa3072_pkcs1_sha256 (0x090D),
-  mldsa65_rsa4096_pkcs1_sha384 (0x090E),
-  mldsa44_rsa2048_pss_pss_sha256 (0x090F),
-  mldsa65_rsa3072_pss_pss_sha256 (0x0910),
-  mldsa65_rsa4096_pss_pss_sha384 (0x0911),
-  mldsa87_ed448 (0x0912)
+  mldsa44_ecdsa_secp256r1_sha256 (TBD1),
+  mldsa65_ecdsa_secp384r1_sha384 (TBD2),
+  mldsa87_ecdsa_secp384r1_sha384 (TBD3),
+  mldsa44_ed25519 (TBD4),
+  mldsa65_ed25519 (TBD5),
+  mldsa44_rsa2048_pkcs1_sha256 (TBD6),
+  mldsa65_rsa3072_pkcs1_sha256 (TBD7),
+  mldsa65_rsa4096_pkcs1_sha384 (TBD8),
+  mldsa44_rsa2048_pss_pss_sha256 (TBD9),
+  mldsa65_rsa3072_pss_pss_sha256 (TBD10),
+  mldsa65_rsa4096_pss_pss_sha384 (TBD11),
+  mldsa87_ed448 (TBD12)
 } SignatureScheme
 ~~~
 
-Each entry specifies a unique combination of an ML-DSA parameter, an elliptic curve or RSA variant, and a hashing function. The first algorithm corresponds to ML-DSA-44, ML-DSA-65, and ML-DSA-87, as defined in {{FIPS204}}. It is important to note that the mldsa* entries represent the pure versions of these algorithms and should not be confused with prehashed variants, such as HashML-DSA-44, also defined in {{FIPS204}}. Support for prehashed variants is not required because TLS computes the hash of the message (e.g., the transcript of the TLS handshake) that needs to be signed. 
+The SignatureScheme names defined in this document follow the TLS IANA naming convention. In composite ML-DSA schemes, the trailing portion of the name corresponds to the traditional signature algorithm variant (for example, RSASSA-PSS with SHA-256). The explicit RSA key size (for example, RSA2048, RSA3072, or RSA4096) is included to uniquely identify the composite construction and to align with the composite algorithm definitions in {{I-D.ietf-lamps-pq-composite-sigs}}. Each entry specifies a unique combination of an ML-DSA parameter, an elliptic curve or RSA variant, and a hashing function. The first algorithm corresponds to ML-DSA-44, ML-DSA-65, and ML-DSA-87, as defined in {{FIPS204}}. It is important to note that the mldsa* entries represent the pure versions of these algorithms and should not be confused with prehashed variants, such as HashML-DSA-44, also defined in {{FIPS204}}. Support for prehashed variants is not required because TLS computes the hash of the message (e.g., the transcript of the TLS handshake) that needs to be signed. 
 
 ML-DSA supports two signing modes: deterministic and hedged. In the deterministic mode, the signature is derived solely from the message and the private key, without requiring fresh randomness at signing time. While this eliminates dependence on an external random number generator (RNG), it may increase susceptibility to side-channel attacks, such as fault injection. The hedged mode mitigates this risk by incorporating both fresh randomness generated at signing time and precomputed randomness embedded in the private key, thereby offering stronger protection against such attacks. In the context of TLS, authentication signatures are computed over unique handshake transcripts, making each signature input distinct for every session. This property allows the use of either signing mode. The hedged signing mode can be leveraged to provide protection against the side-channel attack. The choice between deterministic and hedged modes does not affect interoperability, as the verification process is the same for both. In both modes, the context parameter defined in Algorithm 2 and Algorithm 3 of {{FIPS204}} MUST be set to the empty string.
 
@@ -165,7 +165,9 @@ Ed25519 and Ed448 ensure SUF security, which may remain secure even if ML-DSA is
 emerge. Applications that prioritize SUF security may benefit from using them in composite with ML-DSA to
 mitigate risks if ML-DSA is eventually broken.
 
-TLS clients that support both post-quantum and traditional-only signature algorithms are vulnerable to downgrade attacks. In such a scenario, an attacker with access to a CRQC could forge a traditional server certificate, thereby impersonating the server. If the client accepts traditional-only certificates, it will be exposed to this risk. To mitigate such attacks, clients SHOULD enforce a policy to reject traditional-only certificates once post-quantum or composite authentication is broadly deployed and the need to interoperate with legacy servers has passed. In the interim, accepting traditional-only certificates remains necessary for compatibility with the existing ecosystem, where many servers have not yet upgraded to PQ or composite authentication mechanisms. 
+TLS clients that support both post-quantum and traditional-only signature algorithms are vulnerable to downgrade attacks. In such a scenario, an attacker with access to a CRQC could forge a traditional server certificate, thereby impersonating the server. If the client accepts traditional-only certificates for backward compatibility, it will be exposed to this risk. 
+
+While the widespread deployment of composite or post-quantum certificates will reduce exposure, clients remain vulnerable unless they enforce stricter authentication policies. A coordinated "flag day" in which all traditional-only certificates are simultaneously phased out across the ecosystem is highly unlikely, due to real-world deployment constraints. To address this deployment challenge, implementations MAY adopt a strategy to allow clients to cache a server's support for composite or PQ certificates, similar to the HTTP Strict Transport Security (HSTS) mechanism. Once a client observes a server presenting a composite or PQ certificate, it could remember it and reject fallback to traditional-only authentication in future connections to that server. 
 
 # IANA Considerations
 
@@ -175,18 +177,18 @@ according to the procedures in {{Section 6 of TLSIANA}}.
 
 | Value   | Description                         | Recommended | Reference      |
 |---------|-------------------------------------|-------------|----------------|
-| 0x0907  | mldsa44_ecdsa_secp256r1_sha256      | N           | This document. |
-| 0x0908  | mldsa65_ecdsa_secp384r1_sha384      | N           | This document. |
-| 0x0909  | mldsa87_ecdsa_secp384r1_sha384      | N           | This document. |
-| 0x090A  | mldsa44_ed25519                     | N           | This document. |
-| 0x090B  | mldsa65_ed25519                     | N           | This document. |
-| 0x090C  | mldsa44_rsa2048_pkcs1_sha256        | N           | This document. |
-| 0x090D  | mldsa65_rsa3072_pkcs1_sha256        | N           | This document. |
-| 0x090E  | mldsa65_rsa4096_pkcs1_sha384        | N           | This document. |
-| 0x090F  | mldsa44_rsa2048_pss_pss_sha256      | N           | This document. |
-| 0x0910  | mldsa65_rsa3072_pss_pss_sha256      | N           | This document. |
-| 0x0911  | mldsa65_rsa4096_pss_pss_sha384      | N           | This document. |
-| 0x0912  | mldsa87_ed448                       | N           | This document. |
+| TBD1    | mldsa44_ecdsa_secp256r1_sha256      | N           | This document. |
+| TBD2    | mldsa65_ecdsa_secp384r1_sha384      | N           | This document. |
+| TBD3    | mldsa87_ecdsa_secp384r1_sha384      | N           | This document. |
+| TBD4    | mldsa44_ed25519                     | N           | This document. |
+| TBD5    | mldsa65_ed25519                     | N           | This document. |
+| TBD6    | mldsa44_rsa2048_pkcs1_sha256        | N           | This document. |
+| TBD7    | mldsa65_rsa3072_pkcs1_sha256        | N           | This document. |
+| TBD8    | mldsa65_rsa4096_pkcs1_sha384        | N           | This document. |
+| TBD9    | mldsa44_rsa2048_pss_pss_sha256      | N           | This document. |
+| TBD10   | mldsa65_rsa3072_pss_pss_sha256      | N           | This document. |
+| TBD11   | mldsa65_rsa4096_pss_pss_sha384      | N           | This document. |
+| TBD12   | mldsa87_ed448                       | N           | This document. |
 
 ## Restricting Composite Signature Algorithms to the signature_algorithms_cert Extension
 
@@ -197,4 +199,4 @@ IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs1_sh
 # Acknowledgments
 {:numbered="false"}
 
-Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing and Sean Turner for the discussion and comments.
+Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Daniel Van Geest, and Sean Turner for the discussion and comments.
