@@ -82,7 +82,7 @@ One practical way to implement a hybrid signature scheme is through a composite 
 
 Certain jurisdictions are already recommending or mandating that PQC lattice schemes be used exclusively within a PQ/T hybrid framework. The use of Composite schemes provides a straightforward implementation of hybrid solutions compatible with (and advocated by) some governments and cybersecurity agencies {{BSI2021}}.
 
-ML-DSA {{FIPS204}} is a post-quantum signature schemes standardised by NIST. It is a module-lattice based scheme.
+ML-DSA {{FIPS204}} is a post-quantum signature scheme standardised by NIST. It is a module-lattice based scheme.
 
 This memo specifies how a composite ML-DSA can be negotiated for authentication in TLS 1.3 via the "signature_algorithms" and "signature_algorithms_cert" extensions. Hybrid signatures provide additional safety by ensuring protection even if vulnerabilities are discovered in one of the constituent algorithms. For deployments that cannot easily tweak configuration or effectively enable/disable algorithms, a composite signature combining PQC signature algorithm with an traditional signature algorithm offers the most viable solution.
 
@@ -130,7 +130,13 @@ Each entry specifies a unique combination of an ML-DSA parameter set (ML-DSA-44,
 
 ML-DSA supports two signing modes: deterministic and hedged. In the deterministic mode, the signature is derived solely from the message and the private key, without requiring fresh randomness at signing time. While this eliminates dependence on an external random number generator (RNG), it may increase susceptibility to side-channel attacks, such as fault injection. The hedged mode mitigates this risk by incorporating both fresh randomness generated at signing time and precomputed randomness embedded in the private key, thereby offering stronger protection against such attacks. In the context of TLS, authentication signatures are computed over unique handshake transcripts, making each signature input distinct for every session. This property allows the use of either signing mode. The hedged signing mode can be leveraged to provide protection against the side-channel attack. The choice between deterministic and hedged modes does not affect interoperability, as the verification process is the same for both. In both modes, the context parameter defined in Algorithm 2 and Algorithm 3 of {{FIPS204}} MUST be set to the empty string.
 
-The signature MUST be computed and verified as specified in {{Section 4.4.3 of RFC8446}}. The Composite-ML-DSA.Sign function, defined in {{I-D.ietf-lamps-pq-composite-sigs}}, will be utilized by the sender to compute the signature field of the CertificateVerify message. Conversely, the Composite-ML-DSA.Verify function, also defined in {{I-D.ietf-lamps-pq-composite-sigs}}, will be employed by the receiver to verify the signature field of the CertificateVerify message. 
+The signature in the CertificateVerify message MUST be computed as specified in {{Section 4.4.3 of RFC8446}}.
+
+When a composite ML-DSA signature scheme defined in this document is negotiated, the TLS 1.3 CertificateVerify signing input constructed as specified in {{Section 4.4.3 of RFC8446}} MUST be provided as the message input M to the Composite-ML-DSA.Sign function defined in {{I-D.ietf-lamps-pq-composite-sigs}}. The composite signature construction then applies its domain separation, labeling, and pre-hash function as specified by the composite algorithm identifier. Any pre-hash function applied as part of the composite signature construction is determined by the composite algorithm identifier defined in {{I-D.ietf-lamps-pq-composite-sigs}} and is independent of the TLS SignatureScheme name.
+
+The traditional signature algorithm is fully specified by the composite algorithm identifier and includes all algorithm parameters, including any associated hash function. The Trad.Sign operation defined in {{I-D.ietf-lamps-pq-composite-sigs}} is performed exactly as defined for that algorithm identifier.
+
+Upon receipt of the CertificateVerify message, the peer MUST verify the signature by applying the corresponding Composite-ML-DSA.Verify function to the received signature and the locally constructed TLS 1.3 CertificateVerify signing input, in accordance with {{I-D.ietf-lamps-pq-composite-sigs}}.
 
 The corresponding end-entity certificate when negotiated MUST
 use the First AlgorithmID and Second AlgorithmID respectively as
@@ -146,7 +152,7 @@ A peer that receives a CertificateVerify message indicating the use of the RSASS
 
 # Selection Criteria for Composite Signature Algorithms
 
-The composite signatures specified in the document are restricted set of cryptographic pairs, chosen from the intersection of two sources:
+The composite signatures specified in the document are a restricted set of cryptographic pairs, chosen from the intersection of two sources:
 
 * The composite algorithm combinations as recommended in {{I-D.ietf-lamps-pq-composite-sigs}}, which specify both PQC and traditional signature algorithms.
 * The mandatory-to-support or recommended traditional signature algorithms listed in TLS 1.3.
