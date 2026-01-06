@@ -80,11 +80,11 @@ Cautious implementers may opt to combine cryptographic algorithms in such a way 
 
 One practical way to implement a hybrid signature scheme is through a composite signature algorithm. In this approach, the composite signature consists of two signature components, each produced by a different signature algorithm. A composite key is treated as a single key that performs a single cryptographic operation such as key generation, signing and verification by using its internal sequence of component keys as if they form a single key.
 
-Certain jurisdictions are already recommending or mandating that PQC lattice schemes be used exclusively within a PQ/T hybrid framework. The use of Composite schemes provides a straightforward implementation of hybrid solutions compatible with (and advocated by) some governments and cybersecurity agencies {{BSI2021}}.
+Certain jurisdictions are already recommending or mandating that PQC lattice schemes be used exclusively within a PQ/T hybrid framework. The use of composite schemes provides a straightforward implementation of hybrid solutions compatible with (and advocated by) some governments and cybersecurity agencies {{BSI2021}}.
 
 ML-DSA {{FIPS204}} is a post-quantum signature scheme standardised by NIST. It is a module-lattice based scheme.
 
-This memo specifies how a composite ML-DSA can be negotiated for authentication in TLS 1.3 via the "signature_algorithms" and "signature_algorithms_cert" extensions. Hybrid signatures provide additional safety by ensuring protection even if vulnerabilities are discovered in one of the constituent algorithms. For deployments that cannot easily tweak configuration or effectively enable/disable algorithms, a composite signature combining PQC signature algorithm with an traditional signature algorithm offers the most viable solution.
+This memo specifies how a composite ML-DSA can be negotiated for authentication in TLS 1.3 via the "signature_algorithms" and "signature_algorithms_cert" extensions. Hybrid signatures provide additional safety by ensuring protection even if vulnerabilities are discovered in one of the constituent algorithms. For deployments that cannot easily tweak configuration or effectively enable/disable algorithms, a composite signature combining PQC signature algorithm with a traditional signature algorithm offers the most viable solution.
 
 The rationale for this approach is based on the limitations of fallback strategies. For example, if a traditional signature system is compromised, reverting to a PQC signature algorithm would prevent attackers from forging new signatures that are no longer accepted. However, such a fallback process leaves systems exposed until the transition to the PQC signature algorithm is complete, which can be slow in many environments. In contrast, using hybrid signatures from the start mitigates this issue, offering robust protection and encouraging faster adoption of PQC.
 
@@ -103,38 +103,50 @@ This document is consistent with the terminology defined in {{I-D.ietf-pquip-pqt
 # ML-DSA SignatureSchemes Types
 
 As defined in {{RFC8446}}, the SignatureScheme namespace is used for
-the negotiation of signature scheme for authentication via the
+the negotiation of signature schemes for authentication via the
 "signature_algorithms" and "signature_algorithms_cert" extensions.
 This document adds new SignatureSchemes types for the composite ML-DSA as follows.
 
 ~~~
+
 enum {
+  /* ECDSA-based Composite */ 
   mldsa44_ecdsa_secp256r1_sha256 (TBD1),
-  mldsa65_ecdsa_secp384r1_sha384 (TBD2),
-  mldsa87_ecdsa_secp384r1_sha384 (TBD3),
+  mldsa65_ecdsa_secp256r1_sha512 (TBD2), 
+  mldsa65_ecdsa_secp384r1_sha512 (TBD3), 
+
+  /* EdDSA-based Composite */
   mldsa44_ed25519 (TBD4),
   mldsa65_ed25519 (TBD5),
-  mldsa44_rsa2048_pkcs1_sha256 (TBD6),
-  mldsa65_rsa3072_pkcs1_sha256 (TBD7),
-  mldsa65_rsa4096_pkcs1_sha384 (TBD8),
-  mldsa44_rsa2048_pss_pss_sha256 (TBD9),
-  mldsa65_rsa3072_pss_pss_sha256 (TBD10),
-  mldsa65_rsa4096_pss_pss_sha384 (TBD11),
-  mldsa87_ed448 (TBD12)
-} SignatureScheme
+  mldsa87_ed448 (TBD6), 
+
+  /* RSA-PKCS1-based Composite (for signature_algorithms_cert ONLY) */
+  mldsa44_rsa2048_pkcs1_sha256 (TBD7),
+  mldsa65_rsa3072_pkcs1_sha512 (TBD8),
+  mldsa65_rsa4096_pkcs1_sha512 (TBD9),
+
+  /* RSA-PSS-based Composite (for CertificateVerify and Certificates) */
+  mldsa44_rsa2048_pss_pss_sha256 (TBD10),
+  mldsa65_rsa3072_pss_pss_sha512 (TBD11),
+  mldsa87_rsa3072_pss_pss_sha512 (TBD12), 
+  mldsa65_rsa4096_pss_pss_sha512 (TBD13), 
+  mldsa87_rsa4096_pss_pss_sha512 (TBD14)  
+  
+} SignatureScheme;
+
 ~~~
 
 The SignatureScheme names defined in this document follow the TLS IANA naming convention. In composite ML-DSA schemes, the trailing portion of the name corresponds to the traditional signature algorithm variant, including its associated hash function (for example, RSASSA-PSS with SHA-256). The pre-hash function in the composite ML-DSA algorithm names defined in {{I-D.ietf-lamps-pq-composite-sigs}} is not used in the TLS name. The explicit RSA key size (for example, RSA2048, RSA3072, or RSA4096) is included to uniquely identify the composite construction and to align with the composite algorithm definitions in {{I-D.ietf-lamps-pq-composite-sigs}}. The hash function indicated in the name applies only to the traditional signature component; ML-DSA internally defines its own hashing as specified in {{FIPS204}}.
 
-Each entry specifies a unique combination of an ML-DSA parameter set (ML-DSA-44, ML-DSA-65, or ML-DSA-87, as defined in {{FIPS204}}) and a traditional signature algorithm. The mldsa* identifiers refer to the pure ML-DSA variants and MUST NOT be confused with prehashed variants (for example, HashML-DSA-44). Support for prehashed variants is not required, since TLS already hashes the handshake transcript prior to signing.
+Each entry specifies a unique combination of an ML-DSA parameter set (ML-DSA-44, ML-DSA-65, or ML-DSA-87, as defined in {{FIPS204}}) and a traditional signature algorithm. The mldsa* identifiers refer to the pure ML-DSA variants and MUST NOT be confused with prehashed variants (for example, HashML-DSA-44). 
 
-ML-DSA supports two signing modes: deterministic and hedged. In the deterministic mode, the signature is derived solely from the message and the private key, without requiring fresh randomness at signing time. While this eliminates dependence on an external random number generator (RNG), it may increase susceptibility to side-channel attacks, such as fault injection. The hedged mode mitigates this risk by incorporating both fresh randomness generated at signing time and precomputed randomness embedded in the private key, thereby offering stronger protection against such attacks. In the context of TLS, authentication signatures are computed over unique handshake transcripts, making each signature input distinct for every session. This property allows the use of either signing mode. The hedged signing mode can be leveraged to provide protection against the side-channel attack. The choice between deterministic and hedged modes does not affect interoperability, as the verification process is the same for both. In both modes, the context parameter defined in Algorithm 2 and Algorithm 3 of {{FIPS204}} MUST be set to the empty string.
+ML-DSA supports two signing modes: deterministic and hedged. In the deterministic mode, the signature is derived solely from the message and the private key, without requiring fresh randomness at signing time. While this eliminates dependence on an external random number generator (RNG), it may increase susceptibility to side-channel attacks, such as fault injection. The hedged mode mitigates this risk by incorporating both fresh randomness generated at signing time and precomputed randomness embedded in the private key, thereby offering stronger protection against such attacks. In the context of TLS, authentication signatures are computed over a signing input derived from the handshake transcript, making each signature input distinct for every session. This property allows the use of either signing mode. The hedged signing mode can be leveraged to provide protection against the side-channel attack. The choice between deterministic and hedged modes does not affect interoperability, as the verification process is the same for both. In both modes, the context parameter defined in Algorithm 2 and Algorithm 3 of {{FIPS204}} MUST be set to the empty string.
 
 The signature in the CertificateVerify message MUST be computed as specified in {{Section 4.4.3 of RFC8446}}.
 
 When a composite ML-DSA signature scheme defined in this document is negotiated, the TLS 1.3 CertificateVerify signing input constructed as specified in {{Section 4.4.3 of RFC8446}} MUST be provided as the message input M to the Composite-ML-DSA.Sign function defined in {{I-D.ietf-lamps-pq-composite-sigs}}. The composite signature construction then applies its domain separation, labeling, and pre-hash function as specified by the composite algorithm identifier. Any pre-hash function applied as part of the composite signature construction is determined by the composite algorithm identifier defined in {{I-D.ietf-lamps-pq-composite-sigs}} and is independent of the TLS SignatureScheme name.
 
-The traditional signature algorithm is fully specified by the composite algorithm identifier and includes all algorithm parameters, including any associated hash function. The Trad.Sign operation defined in {{I-D.ietf-lamps-pq-composite-sigs}} is performed exactly as defined for that algorithm identifier.
+The traditional signature algorithm and its associated parameters including the specific hash function are fully determined by the negotiated composite algorithm identifier (OID). The Trad.Sign operation, as defined in {{I-D.ietf-lamps-pq-composite-sigs}}, MUST be performed using the hash function implicitly bound to that OID.
 
 Upon receipt of the CertificateVerify message, the peer MUST verify the signature by applying the corresponding Composite-ML-DSA.Verify function to the received signature and the locally constructed TLS 1.3 CertificateVerify signing input, in accordance with {{I-D.ietf-lamps-pq-composite-sigs}}.
 
@@ -146,7 +158,7 @@ The schemes defined in this document MUST NOT be used in TLS 1.2 {{RFC5246}}. A 
 
 # Signature Algorithm Restrictions
 
-TLS 1.3 removed support for RSASSA-PKCS1-v1_5 {{RFC8017}} in CertificateVerify messages, opting for RSASSA-PSS instead. Similarly, this document restricts the use of the composite signature algorithms mldsa44_rsa2048_pkcs1_sha256, mldsa65_rsa3072_pkcs1_sha256, and mldsa65_rsa4096_pkcs1_sha384 algorithms to the "signature_algorithms_cert" extension. These composite signature algorithms MUST NOT be used with the "signature_algorithms" extension. These values refer solely to signatures which appear in certificates (see {{Section 4.4.2.2 of RFC8446}}) and are not defined for use in signed TLS handshake messages.
+TLS 1.3 removed support for RSASSA-PKCS1-v1_5 {{RFC8017}} in CertificateVerify messages, opting for RSASSA-PSS instead. Similarly, this document restricts the use of the composite signature algorithms mldsa44_rsa2048_pkcs1_sha256, mldsa65_rsa3072_pkcs1_sha512, and mldsa65_rsa4096_pkcs1_sha512 algorithms to the "signature_algorithms_cert" extension. These composite signature algorithms MUST NOT be used with the "signature_algorithms" extension. These values refer solely to signatures which appear in certificates (see {{Section 4.4.2.2 of RFC8446}}) and are not defined for use in signed TLS handshake messages.
 
 A peer that receives a CertificateVerify message indicating the use of the RSASSA-PKCS1-v1_5 algorithm as one of the component signature algorithms MUST terminate the connection with a fatal illegal_parameter alert.
 
@@ -166,7 +178,7 @@ This conservative approach reduces the risk of selecting unsafe or incompatible 
 
 # Security Considerations
 
-The security considerations discussed in Section 11 of {{I-D.ietf-lamps-pq-composite-sigs}} needs
+The security considerations discussed in Section 11 of {{I-D.ietf-lamps-pq-composite-sigs}} need
 to be taken into account. 
 
 Ed25519 and Ed448 ensure SUF security, which may remain secure even if ML-DSA is broken, at least until CRQCs
@@ -183,24 +195,26 @@ This document requests new entries to the TLS SignatureScheme registry,
 according to the procedures in {{Section 6 of TLSIANA}}.
 
 
-| Value   | Description                         | Recommended | Reference      |
-|---------|-------------------------------------|-------------|----------------|
-| TBD1    | mldsa44_ecdsa_secp256r1_sha256      | N           | This document. |
-| TBD2    | mldsa65_ecdsa_secp384r1_sha384      | N           | This document. |
-| TBD3    | mldsa87_ecdsa_secp384r1_sha384      | N           | This document. |
-| TBD4    | mldsa44_ed25519                     | N           | This document. |
-| TBD5    | mldsa65_ed25519                     | N           | This document. |
-| TBD6    | mldsa44_rsa2048_pkcs1_sha256        | N           | This document. |
-| TBD7    | mldsa65_rsa3072_pkcs1_sha256        | N           | This document. |
-| TBD8    | mldsa65_rsa4096_pkcs1_sha384        | N           | This document. |
-| TBD9    | mldsa44_rsa2048_pss_pss_sha256      | N           | This document. |
-| TBD10   | mldsa65_rsa3072_pss_pss_sha256      | N           | This document. |
-| TBD11   | mldsa65_rsa4096_pss_pss_sha384      | N           | This document. |
-| TBD12   | mldsa87_ed448                       | N           | This document. |
+| Value  | Description                              | Recommended | Reference      |
+|--------|------------------------------------------|-------------|----------------|
+| TBD1   | mldsa44_ecdsa_secp256r1_sha256           | N           | This document. |
+| TBD2   | mldsa65_ecdsa_secp256r1_sha512           | N           | This document. |
+| TBD3   | mldsa65_ecdsa_secp384r1_sha512           | N           | This document. |
+| TBD4   | mldsa44_ed25519                          | N           | This document. |
+| TBD5   | mldsa65_ed25519                          | N           | This document. |
+| TBD6   | mldsa87_ed448                            | N           | This document. |
+| TBD7   | mldsa44_rsa2048_pkcs1_sha256             | N           | This document. |
+| TBD8   | mldsa65_rsa3072_pkcs1_sha512             | N           | This document. |
+| TBD9   | mldsa65_rsa4096_pkcs1_sha512             | N           | This document. |
+| TBD10  | mldsa44_rsa2048_pss_pss_sha256           | N           | This document. |
+| TBD11  | mldsa65_rsa3072_pss_pss_sha512           | N           | This document. |
+| TBD12  | mldsa87_rsa3072_pss_pss_sha512           | N           | This document. |
+| TBD13  | mldsa65_rsa4096_pss_pss_sha512           | N           | This document. |
+| TBD14  | mldsa87_rsa4096_pss_pss_sha512           | N           | This document. |
 
 ## Restricting Composite Signature Algorithms to the signature_algorithms_cert Extension
 
-IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs1_sha256, mldsa65_rsa3072_pkcs1_sha256, and mldsa65_rsa4096_pkcs1_sha384 algorithms are defined exclusively for use with the signature_algorithms_cert extension and are not intended for use with the signature_algorithms extension.
+IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs1_sha256, mldsa65_rsa3072_pkcs1_sha512, and mldsa65_rsa4096_pkcs1_sha512 algorithms are defined exclusively for use with the signature_algorithms_cert extension and are not intended for use with the signature_algorithms extension.
 
 --- back
 
