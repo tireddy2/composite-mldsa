@@ -114,23 +114,24 @@ enum {
   mldsa44_ecdsa_secp256r1_sha256 (TBD1),
   mldsa65_ecdsa_secp256r1_sha512 (TBD2), 
   mldsa65_ecdsa_secp384r1_sha512 (TBD3), 
+  mldsa87_ecdsa_secp384r1_sha512 (TBD4), 
 
   /* EdDSA-based Composite */
-  mldsa44_ed25519 (TBD4),
-  mldsa65_ed25519 (TBD5),
-  mldsa87_ed448 (TBD6), 
+  mldsa44_ed25519 (TBD5),
+  mldsa65_ed25519 (TBD6),
+  mldsa87_ed448 (TBD7), 
 
   /* RSA-PKCS1-based Composite (for signature_algorithms_cert ONLY) */
-  mldsa44_rsa2048_pkcs1_sha256 (TBD7),
-  mldsa65_rsa3072_pkcs1_sha512 (TBD8),
-  mldsa65_rsa4096_pkcs1_sha512 (TBD9),
+  mldsa44_rsa2048_pkcs1_sha256 (TBD8),
+  mldsa65_rsa3072_pkcs1_sha512 (TBD9),
+  mldsa65_rsa4096_pkcs1_sha512 (TBD10),
 
   /* RSA-PSS-based Composite (for CertificateVerify and Certificates) */
-  mldsa44_rsa2048_pss_pss_sha256 (TBD10),
-  mldsa65_rsa3072_pss_pss_sha512 (TBD11),
-  mldsa87_rsa3072_pss_pss_sha512 (TBD12), 
-  mldsa65_rsa4096_pss_pss_sha512 (TBD13), 
-  mldsa87_rsa4096_pss_pss_sha512 (TBD14)  
+  mldsa44_rsa2048_pss_pss_sha256 (TBD11),
+  mldsa65_rsa3072_pss_pss_sha512 (TBD12),
+  mldsa87_rsa3072_pss_pss_sha512 (TBD13), 
+  mldsa65_rsa4096_pss_pss_sha512 (TBD14), 
+  mldsa87_rsa4096_pss_pss_sha512 (TBD15)  
   
 } SignatureScheme;
 
@@ -200,17 +201,18 @@ according to the procedures in {{Section 6 of TLSIANA}}.
 | TBD1   | mldsa44_ecdsa_secp256r1_sha256           | N           | This document. |
 | TBD2   | mldsa65_ecdsa_secp256r1_sha512           | N           | This document. |
 | TBD3   | mldsa65_ecdsa_secp384r1_sha512           | N           | This document. |
-| TBD4   | mldsa44_ed25519                          | N           | This document. |
-| TBD5   | mldsa65_ed25519                          | N           | This document. |
-| TBD6   | mldsa87_ed448                            | N           | This document. |
-| TBD7   | mldsa44_rsa2048_pkcs1_sha256             | N           | This document. |
-| TBD8   | mldsa65_rsa3072_pkcs1_sha512             | N           | This document. |
-| TBD9   | mldsa65_rsa4096_pkcs1_sha512             | N           | This document. |
-| TBD10  | mldsa44_rsa2048_pss_pss_sha256           | N           | This document. |
-| TBD11  | mldsa65_rsa3072_pss_pss_sha512           | N           | This document. |
-| TBD12  | mldsa87_rsa3072_pss_pss_sha512           | N           | This document. |
-| TBD13  | mldsa65_rsa4096_pss_pss_sha512           | N           | This document. |
-| TBD14  | mldsa87_rsa4096_pss_pss_sha512           | N           | This document. |
+| TBD4   | mldsa87_ecdsa_secp384r1_sha512           | N           | This document. |
+| TBD5   | mldsa44_ed25519                          | N           | This document. |
+| TBD6   | mldsa65_ed25519                          | N           | This document. |
+| TBD7   | mldsa87_ed448                            | N           | This document. |
+| TBD8   | mldsa44_rsa2048_pkcs1_sha256             | N           | This document. |
+| TBD9   | mldsa65_rsa3072_pkcs1_sha512             | N           | This document. |
+| TBD10  | mldsa65_rsa4096_pkcs1_sha512             | N           | This document. |
+| TBD11  | mldsa44_rsa2048_pss_pss_sha256           | N           | This document. |
+| TBD12  | mldsa65_rsa3072_pss_pss_sha512           | N           | This document. |
+| TBD13  | mldsa87_rsa3072_pss_pss_sha512           | N           | This document. |
+| TBD14  | mldsa65_rsa4096_pss_pss_sha512           | N           | This document. |
+| TBD15  | mldsa87_rsa4096_pss_pss_sha512           | N           | This document. |
 
 ## Restricting Composite Signature Algorithms to the signature_algorithms_cert Extension
 
@@ -221,4 +223,4 @@ IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs1_sh
 # Acknowledgments
 {:numbered="false"}
 
-Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Daniel Van Geest, and Sean Turner for the discussion and comments.
+Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Daniel Van Geest, Samuel Lee, and Sean Turner for the discussion and comments.
