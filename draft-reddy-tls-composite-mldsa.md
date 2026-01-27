@@ -52,7 +52,7 @@ normative:
 informative:
  RFC5246:
  RFC8017:
- I-D.ietf-pquip-pqt-hybrid-terminology:
+ RFC9794:
  FIPS204:
    title: "FIPS-204: Module-Lattice-Based Digital Signature Standard"
    target: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf
@@ -94,18 +94,20 @@ Further, zero-day vulnerabilities, where an exploit is discovered and used befor
 
 {::boilerplate bcp14+}
 
-This document is consistent with the terminology defined in {{I-D.ietf-pquip-pqt-hybrid-terminology}}. It defines composites as:
+This document is consistent with the terminology defined in {{RFC9794}}. It defines composites as:
 
 >   *Composite Cryptographic Element*:  A cryptographic element that
 >      incorporates multiple component cryptographic elements of the same
 >      type in a multi-algorithm scheme.
+
+In this document, “composite ML-DSA” refers to a composite ML-DSA signature scheme as defined in {{I-D.ietf-lamps-pq-composite-sigs}}.
 
 # ML-DSA SignatureSchemes Types
 
 As defined in {{RFC8446}}, the SignatureScheme namespace is used for
 the negotiation of signature schemes for authentication via the
 "signature_algorithms" and "signature_algorithms_cert" extensions.
-This document adds new SignatureSchemes types for the composite ML-DSA as follows.
+This document adds new SignatureScheme values for composite ML-DSA as follows.
 
 ~~~
 
@@ -213,7 +215,7 @@ algorithm behavior and is purely descriptive.
 The security considerations discussed in Section 11 of {{I-D.ietf-lamps-pq-composite-sigs}} need
 to be taken into account. 
 
-Ed25519 and Ed448 ensure SUF security, which may remain secure even if ML-DSA is broken, at least until CRQCs
+Ed25519 and Ed448 provide SUF security properties which, when used as a component in a composite construction, may continue to provide resilience even if weaknesses are later discovered in ML-DSA, at least until CRQCs
 emerge. Applications that prioritize SUF security may benefit from using them in composite with ML-DSA to
 mitigate risks if ML-DSA is eventually broken.
 
