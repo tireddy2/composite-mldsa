@@ -189,27 +189,24 @@ algorithm identifiers defined in
 {{I-D.ietf-lamps-pq-composite-sigs}}. Each composite algorithm combines
 ML-DSA with a traditional signature algorithm and hash function.
 
-| TLS SignatureScheme                    | Composite ML-DSA Algorithm Name            | Traditional Component / Hash              |
-|---------------------------------------|--------------------------------------------|-------------------------------------------|
-| mldsa44_ecdsa_secp256r1_sha256        | id-MLDSA44-ECDSA-P256-SHA256               | ECDSA P-256 / SHA-256                     |
-| mldsa65_ecdsa_secp256r1_sha512        | id-MLDSA65-ECDSA-P256-SHA512               | ECDSA P-256 / SHA-512                     |
-| mldsa65_ecdsa_secp384r1_sha512        | id-MLDSA65-ECDSA-P384-SHA512               | ECDSA P-384 / SHA-512                     |
-| mldsa87_ecdsa_secp384r1_sha512        | id-MLDSA87-ECDSA-P384-SHA512               | ECDSA P-384 / SHA-512                     |
-| mldsa44_ed25519_sha512                | id-MLDSA44-Ed25519-SHA512                  | Ed25519 (internal SHA-512)                |
-| mldsa65_ed25519_sha512                | id-MLDSA65-Ed25519-SHA512                  | Ed25519 (internal SHA-512)                |
-| mldsa87_ed448_shake256                | id-MLDSA87-Ed448-SHAKE256                  | Ed448 (internal SHAKE256)                 |
-| mldsa44_rsa2048_pss_pss_sha256        | id-MLDSA44-RSA2048-PSS-SHA256              | RSA-2048 PSS / SHA-256                    |
-| mldsa65_rsa3072_pss_pss_sha512        | id-MLDSA65-RSA3072-PSS-SHA512              | RSA-3072 PSS / SHA-512                    |
-| mldsa87_rsa3072_pss_pss_sha512        | id-MLDSA87-RSA3072-PSS-SHA512              | RSA-3072 PSS / SHA-512                    |
-| mldsa65_rsa4096_pss_pss_sha512        | id-MLDSA65-RSA4096-PSS-SHA512              | RSA-4096 PSS / SHA-512                    |
-| mldsa87_rsa4096_pss_pss_sha512        | id-MLDSA87-RSA4096-PSS-SHA512              | RSA-4096 PSS / SHA-512                    |
-| mldsa44_rsa2048_pkcs1_sha256          | id-MLDSA44-RSA2048-PKCS15-SHA256           | RSA-2048 PKCS#1 v1.5 / SHA-256            |
-| mldsa65_rsa3072_pkcs1_sha512          | id-MLDSA65-RSA3072-PKCS15-SHA512           | RSA-3072 PKCS#1 v1.5 / SHA-512            |
-| mldsa65_rsa4096_pkcs1_sha512          | id-MLDSA65-RSA4096-PKCS15-SHA512           | RSA-4096 PKCS#1 v1.5 / SHA-512            |
+| TLS SignatureScheme             | Composite ML-DSA Algorithm Name          |
+|--------------------------------|-------------------------------------------|
+| mldsa44_ecdsa_secp256r1_sha256 | id-MLDSA44-ECDSA-P256-SHA256              |
+| mldsa65_ecdsa_secp256r1_sha512 | id-MLDSA65-ECDSA-P256-SHA512              |
+| mldsa65_ecdsa_secp384r1_sha512 | id-MLDSA65-ECDSA-P384-SHA512              |
+| mldsa87_ecdsa_secp384r1_sha512 | id-MLDSA87-ECDSA-P384-SHA512              |
+| mldsa44_ed25519_sha512         | id-MLDSA44-Ed25519-SHA512                 |
+| mldsa65_ed25519_sha512         | id-MLDSA65-Ed25519-SHA512                 |
+| mldsa87_ed448_shake256         | id-MLDSA87-Ed448-SHAKE256                 |
+| mldsa44_rsa2048_pss_pss_sha256 | id-MLDSA44-RSA2048-PSS-SHA256             |
+| mldsa65_rsa3072_pss_pss_sha512 | id-MLDSA65-RSA3072-PSS-SHA512             |
+| mldsa87_rsa3072_pss_pss_sha512 | id-MLDSA87-RSA3072-PSS-SHA512             |
+| mldsa65_rsa4096_pss_pss_sha512 | id-MLDSA65-RSA4096-PSS-SHA512             |
+| mldsa87_rsa4096_pss_pss_sha512 | id-MLDSA87-RSA4096-PSS-SHA512             |
+| mldsa44_rsa2048_pkcs1_sha256   | id-MLDSA44-RSA2048-PKCS15-SHA256          |
+| mldsa65_rsa3072_pkcs1_sha512   | id-MLDSA65-RSA3072-PKCS15-SHA512          |
+| mldsa65_rsa4096_pkcs1_sha512   | id-MLDSA65-RSA4096-PKCS15-SHA512          |
 
-
-EdDSA-based SignatureSchemes explicitly include the hash function in the name for consistency, even though Ed25519 and Ed448 already define their hash functions internally; the explicit inclusion does not change the
-algorithm behavior and is purely descriptive.
 
 # Security Considerations
 
