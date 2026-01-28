@@ -139,24 +139,31 @@ enum {
 
 ~~~
 
-The SignatureScheme names defined in this document follow the TLS IANA naming convention. In composite ML-DSA schemes, the trailing portion of the name corresponds to the traditional signature algorithm variant, including its associated hash function (for example, RSASSA-PSS with SHA-256). The pre-hash function in the composite ML-DSA algorithm names defined in {{I-D.ietf-lamps-pq-composite-sigs}} is not used in the TLS name. The explicit RSA key size (for example, RSA2048, RSA3072, or RSA4096) is included to uniquely identify the composite construction and to align with the composite algorithm definitions in {{I-D.ietf-lamps-pq-composite-sigs}}. The hash function indicated in the name applies only to the traditional signature component; ML-DSA internally defines its own hashing as specified in {{FIPS204}}.
+This document follows the existing TLS SignatureScheme naming convention. SignatureScheme names are used only as identifiers for negotiation and registry purposes and do not imply TLS-level processing semantics.
+
+Unlike traditional TLS signature schemes such as RSA or ECDSA, TLS does not apply or select a hash function when using Composite ML-DSA. Composite ML-DSA is treated as an opaque signature algorithm, similar to Ed25519 and Ed448, which are specified in TLS 1.3 as "PureEdDSA" algorithms ({{Section 4.2.3 of RFC8446}}). Any hash functions used as part of the composite signature construction are fully determined by the composite algorithm associated with the negotiated TLS SignatureScheme and are internal to the Composite ML-DSA algorithm. 
+
+In composite ML-DSA schemes, the trailing portion of the SignatureScheme name identifies the traditional signature algorithm used as part of the composite construction. This identification is for algorithm selection
+and interoperability purposes only and does not imply any TLS-level processing of the traditional component.
+
+The explicit RSA key size (for example, RSA2048, RSA3072, or RSA4096) is included in the SignatureScheme name solely to uniquely identify the composite algorithm and to align with the composite algorithm definitions
+in {{I-D.ietf-lamps-pq-composite-sigs}}.
 
 Each entry specifies a unique combination of an ML-DSA parameter set (ML-DSA-44, ML-DSA-65, or ML-DSA-87, as defined in {{FIPS204}}) and a traditional signature algorithm. The mldsa* identifiers refer to the pure ML-DSA variants and MUST NOT be confused with prehashed variants (for example, HashML-DSA-44). 
 
-{Sections 3.2 and 3.3 of I-D.ietf-lamps-pq-composite-sigs}} define a context string parameter for signing and verification using Composite ML-DSA. When Composite ML-DSA signature algorithms are used in TLS, both
+{{Sections 3.2 and 3.3 of I-D.ietf-lamps-pq-composite-sigs}} define a context string parameter for signing and verification using Composite ML-DSA. When Composite ML-DSA signature algorithms are used in TLS, both
 signing and verification MUST use an empty context string. TLS already provides protocol-level domain separation by signing a protocol-specific context string together with the handshake transcript ({{Section 4.4.3 of RFC8446}}).
 
 The signature in the CertificateVerify message MUST be computed as specified in {{Section 4.4.3 of RFC8446}}.
 
 When a composite ML-DSA signature scheme defined in this document is negotiated, the TLS 1.3 CertificateVerify signing input constructed as specified in {{Section 4.4.3 of RFC8446}} MUST be provided as the message input M to the Composite-ML-DSA.Sign function defined in {{I-D.ietf-lamps-pq-composite-sigs}}. The composite signature construction then applies its domain separation, labeling, and pre-hash function as specified by the composite algorithm identifier. Any pre-hash function applied as part of the composite signature construction is determined by the composite algorithm identifier defined in {{I-D.ietf-lamps-pq-composite-sigs}} and is independent of the TLS SignatureScheme name.
 
-The traditional signature algorithm and its associated parameters including the specific hash function are fully determined by the negotiated composite algorithm identifier (OID). The Trad.Sign operation, as defined in {{I-D.ietf-lamps-pq-composite-sigs}}, MUST be performed using the hash function implicitly bound to that OID.
+The Trad.Sign operation, as defined in {{I-D.ietf-lamps-pq-composite-sigs}}, MUST be performed using the
+parameters associated with the composite algorithm corresponding to the negotiated TLS SignatureScheme.
 
 Upon receipt of the CertificateVerify message, the peer MUST verify the signature by applying the corresponding Composite-ML-DSA.Verify function to the received signature and the locally constructed TLS 1.3 CertificateVerify signing input, in accordance with {{I-D.ietf-lamps-pq-composite-sigs}}.
 
-The corresponding end-entity certificate when negotiated MUST
-use the First AlgorithmID and Second AlgorithmID respectively as
-defined in {{I-D.ietf-lamps-pq-composite-sigs}}.
+The corresponding end-entity certificate when negotiated MUST use the First AlgorithmID and Second AlgorithmID respectively as defined in {{I-D.ietf-lamps-pq-composite-sigs}}.
 
 The schemes defined in this document MUST NOT be used in TLS 1.2 {{RFC5246}}. A peer that receives ServerKeyExchange or CertificateVerify message in a TLS 1.2 connection with schemes defined in this document MUST abort the connection with an illegal_parameter alert.
 
