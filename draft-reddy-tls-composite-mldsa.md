@@ -102,7 +102,7 @@ This document is consistent with the terminology defined in {{RFC9794}}. It defi
 
 In this document, “composite ML-DSA” refers to a composite ML-DSA signature scheme as defined in {{I-D.ietf-lamps-pq-composite-sigs}}.
 
-# ML-DSA SignatureSchemes Types
+# ML-DSA SignatureSchemes
 
 As defined in {{RFC8446}}, the SignatureScheme namespace is used for
 the negotiation of signature schemes for authentication via the
