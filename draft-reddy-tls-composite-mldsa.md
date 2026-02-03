@@ -193,8 +193,7 @@ This conservative approach reduces the risk of selecting unsafe or incompatible 
 The following table provides a mapping between the TLS `SignatureScheme`
 identifiers defined in this document and the corresponding composite
 algorithm identifiers defined in
-{{I-D.ietf-lamps-pq-composite-sigs}}. Each composite algorithm combines
-ML-DSA with a traditional signature algorithm and hash function.
+{{I-D.ietf-lamps-pq-composite-sigs}}.
 
 | TLS SignatureScheme             | Composite ML-DSA Algorithm Name          |
 |--------------------------------|-------------------------------------------|
