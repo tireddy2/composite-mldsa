@@ -44,7 +44,11 @@ author:
     fullname: Scott Fluhrer
     organization: Cisco Systems
     email: "sfluhrer@cisco.com"
-
+ -
+    fullname: Daniel Van Geest
+    organization: CryptoNext Security
+    email: "daniel.vangeest@cryptonext-security.com"
+ 
 normative:
  RFC8446:
  TLSIANA: I-D.ietf-tls-rfc8447bis
