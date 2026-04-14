@@ -143,12 +143,17 @@ enum {
 
 ~~~
 
+Composite ML-DSA is treated as an opaque signature algorithm by TLS, 
+similar to Ed25519 and Ed448, which use the pure (non-prehashed) forms 
+specified in TLS 1.3 as "PureEdDSA" algorithms ({{Section 4.2.3 of RFC8446}}). 
+The SignatureScheme names defined in this document (for example, `mldsa44_ecdsa_secp256r1_sha256`)  mirror the algorithm names in {{I-D.ietf-lamps-pq-composite-sigs}} (for example, `id-MLDSA44-ECDSA-P256-SHA256`). 
+TLS implementors do not need to be aware of these internal details; for a full description of the composite algorithm construction, see Sections 3.2 and 3.3 of 
+{{I-D.ietf-lamps-pq-composite-sigs}}.
+
 SignatureScheme names are used only as identifiers for negotiation and registry purposes and do not imply TLS-level processing semantics.
 
-Unlike traditional TLS signature schemes such as RSA or ECDSA, TLS does not apply or select a hash function when using Composite ML-DSA. Composite ML-DSA is treated as an opaque signature algorithm, similar to Ed25519 and Ed448, which are specified in TLS 1.3 as "PureEdDSA" algorithms ({{Section 4.2.3 of RFC8446}}). Any hash functions used as part of the composite signature construction are fully determined by the composite algorithm associated with the negotiated TLS SignatureScheme and are internal to the Composite ML-DSA algorithm. 
-
-In composite ML-DSA schemes, the trailing portion of the SignatureScheme name identifies the traditional signature algorithm used as part of the composite construction. This identification is for algorithm selection
-and interoperability purposes only and does not imply any TLS-level processing of the traditional component.
+In composite ML-DSA schemes, the trailing portion of the SignatureScheme name identifies the traditional signature algorithm used as part of the composite construction. This identification is for algorithm selection and interoperability 
+purposes only and does not imply any TLS-level processing of the traditional component.
 
 The explicit RSA key size (for example, RSA2048, RSA3072, or RSA4096) is included in the SignatureScheme name solely to uniquely identify the composite algorithm and to align with the composite algorithm definitions
 in {{I-D.ietf-lamps-pq-composite-sigs}}.
@@ -168,7 +173,8 @@ The schemes defined in this document MUST NOT be used in TLS 1.2 {{RFC5246}}. A 
 
 # Signature Algorithm Restrictions
 
-TLS 1.3 removed support for RSASSA-PKCS1-v1_5 {{RFC8017}} in CertificateVerify messages, opting for RSASSA-PSS instead. Similarly, this document restricts the use of the composite signature algorithms mldsa44_rsa2048_pkcs15_sha256, mldsa65_rsa3072_pkcs15_sha512, and mldsa65_rsa4096_pkcs15_sha512 algorithms to the "signature_algorithms_cert" extension. These composite signature algorithms MUST NOT be used with the "signature_algorithms" extension. These values refer solely to signatures which appear in certificates (see {{Section 4.4.2.2 of RFC8446}}) and are not defined for use in signed TLS handshake messages.
+TLS 1.3 removed support for RSASSA-PKCS1-v1_5 {{RFC8017}} in CertificateVerify messages, opting for RSASSA-PSS instead. Similarly, this document restricts the use of the composite signature algorithms mldsa44_rsa2048_pkcs15_sha256, mldsa65_rsa3072_pkcs15_sha512, and mldsa65_rsa4096_pkcs15_sha512 algorithms, defined 
+in {{I-D.ietf-lamps-pq-composite-sigs}}, to the "signature_algorithms_cert" extension. These composite signature algorithms MUST NOT be used with the "signature_algorithms" extension. These values refer solely to signatures which appear in certificates (see {{Section 4.4.2.2 of RFC8446}}) and are not defined for use in signed TLS handshake messages.
 
 A peer that receives a CertificateVerify message indicating the use of the RSASSA-PKCS1-v1_5 algorithm as one of the component signature algorithms MUST terminate the connection with a fatal illegal_parameter alert.
 
@@ -179,10 +185,7 @@ The composite signatures specified in the document are a restricted set of crypt
 * The composite algorithm combinations as recommended in {{I-D.ietf-lamps-pq-composite-sigs}}, which specify both PQC and traditional signature algorithms.
 * The recommended traditional signature algorithms listed in TLS 1.3.
 
-By limiting algorithm combinations to those defined in both {{I-D.ietf-lamps-pq-composite-sigs}} and TLS 1.3, this specification ensures that each pair: 
-
-* Meets established security standards for composite signatures in a post-quantum context, as described in {{I-D.ietf-lamps-pq-composite-sigs}}.
-* Is compatible with traditional digital signatures recommended in TLS 1.3, ensuring interoperability and ease of adoption within the TLS ecosystem.
+By limiting algorithm combinations to those defined in both {{I-D.ietf-lamps-pq-composite-sigs}} and TLS 1.3, this specification ensures that each pair meets established security standards for composite signatures in a post-quantum context, as described in {{I-D.ietf-lamps-pq-composite-sigs}}.
 
 This conservative approach reduces the risk of selecting unsafe or incompatible configurations, promoting security by requiring only trusted and well-vetted pairs. Future updates to this specification may introduce additional algorithm pairs as standards evolve, subject to similar vetting and inclusion criteria.
 
@@ -258,4 +261,4 @@ IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs15_s
 # Acknowledgments
 {:numbered="false"}
 
-Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Daniel Van Geest, Samuel Lee, and Sean Turner for the discussion and comments.
+Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Daniel Van Geest, Samuel Lee, Eric Rescorla, and Sean Turner for the discussion and comments.
