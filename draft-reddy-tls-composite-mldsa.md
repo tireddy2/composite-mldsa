@@ -152,8 +152,8 @@ TLS implementors do not need to be aware of these internal details; for a full d
 
 SignatureScheme names are used only as identifiers for negotiation and registry purposes and do not imply TLS-level processing semantics.
 
-In composite ML-DSA schemes, the trailing portion of the SignatureScheme name identifies the traditional signature algorithm used as part of the composite construction. This identification is for algorithm selection and interoperability 
-purposes only and does not imply any TLS-level processing of the traditional component.
+In composite ML-DSA schemes, the SignatureScheme name encodes the PQC component (for example, `mldsa44`), the traditional signature algorithm and curve (for example, `ecdsa_secp256r1`), and the internal prehash function (for example, `sha256`) used by the Composite ML-DSA algorithm prior to generating the individual component signatures, as defined in {{I-D.ietf-lamps-pq-composite-sigs}}. This identification is for algorithm selection and interoperability purposes only and does not imply any TLS-level 
+processing of the traditional component.
 
 The explicit RSA key size (for example, RSA2048, RSA3072, or RSA4096) is included in the SignatureScheme name solely to uniquely identify the composite algorithm and to align with the composite algorithm definitions
 in {{I-D.ietf-lamps-pq-composite-sigs}}.
