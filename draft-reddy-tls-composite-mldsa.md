@@ -132,7 +132,7 @@ enum {
   mldsa65_rsa3072_pkcs15_sha512 (TBD9),
   mldsa65_rsa4096_pkcs15_sha512 (TBD10),
 
-  /* RSA-PSS-based Composite (for CertificateVerify and Certificates) */
+  /* RSA-PSS-based Composite */
   mldsa44_rsa2048_pss_sha256 (TBD11),
   mldsa65_rsa3072_pss_sha512 (TBD12),
   mldsa87_rsa3072_pss_sha512 (TBD13), 
@@ -222,7 +222,7 @@ to be taken into account.
 
 Traditional signature algorithms such as ECDSA, Ed25519, and Ed448 provide existential unforgeability under chosen-message attack (EUF-CMA), which is sufficient for TLS authentication. When used as the traditional component in a composite construction with ML-DSA, these algorithms contribute to defense-in-depth during the transition to post-quantum cryptography, maintaining TLS authentication security as long as at least one component algorithm remains secure.
 
-However, composite signature schemes do not in general preserve strong unforgeability (SUF-CMA) once the traditional component algorithm is broken, for example due to the availability of CRQCs. In such cases, a forged traditional signature component can be combined with a valid post-quantum component to produce a composite signature that verifies successfully, violating SUF. This loss of SUF is inherent to the composite construction and does not impact TLS, which relies only on the composite signature verification result.
+However, composite signature schemes do not in general preserve strong unforgeability (SUF-CMA) once the traditional component algorithm is broken, for example due to the availability of CRQCs. In such cases, a forged traditional signature component can be combined with a valid post-quantum component to produce a composite signature that verifies successfully, violating SUF. This loss of SUF is inherent to the composite construction and does not impact TLS, which requires only EUF-CMA security from its signature schemes.
 
 TLS clients that support both post-quantum and traditional-only signature algorithms are vulnerable to downgrade attacks. In such scenarios, an attacker with access to a CRQC could forge a traditional server certificate and impersonate the server. If the client continues to accept traditional-only certificates for backward compatibility, it remains exposed to this risk.
 
@@ -258,7 +258,25 @@ IANA is requested to add a footnote indicating that the mldsa44_rsa2048_pkcs15_s
 
 --- back
 
+# Rationale for a Dedicated TLS Specification (to be removed before publication)
+{:numbered="false"}
+
+While it might appear sufficient to allocate SignatureScheme code points for composite ML-DSA without a dedicated TLS specification, doing so would leave critical TLS-specific decisions unresolved and risk interoperability failures:
+
+- {{I-D.ietf-lamps-pq-composite-sigs}} defines a context string parameter for signing and verification without mandating an empty string for TLS use; implementations could make different choices, causing signature verification failures.
+- {{I-D.ietf-lamps-pq-composite-sigs}} defines both pure and prehashed composite ML-DSA variants; without explicit guidance, implementations could negotiate incompatible modes.
+- RSASSA-PKCS1-v1_5-based composite schemes must be restricted to the `signature_algorithms_cert` extension and must not appear in CertificateVerify messages; this restriction cannot be inferred from code point registration alone.
+- Composite ML-DSA must not be used in TLS 1.2.
+- The LAMPS draft defines a larger set of composite combinations; a TLS specification is needed to define the restricted subset compatible with TLS 1.3.
+
+# Implementation Complexity Considerations (to be removed before publication)
+{:numbered="false"}
+
+A concern has been raised that composite signatures introduce significant API complexity for TLS implementations. This concern does not apply at the TLS layer. From the TLS perspective, a composite key is treated as a single opaque key — identical in handling to any other signature algorithm. The internal decomposition of a composite key into its ML-DSA and traditional component keys is entirely the responsibility of the underlying cryptographic library, not of the TLS implementation. A TLS implementation that supports composite ML-DSA need only handle the negotiated code points and invoke the crypto engine accordingly; the composite construction is invisible above that boundary.
+
+Furthermore, the cryptographic library implementing composite ML-DSA can be shared across multiple protocol stacks — including IPsec, JOSE, SSH, and others — meaning the implementation effort is incurred once and benefits multiple protocols. This makes the effective per-protocol cost of supporting composite ML-DSA minimal.
+
 # Acknowledgments
 {:numbered="false"}
 
-Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Daniel Van Geest, Samuel Lee, Eric Rescorla, and Sean Turner for the discussion and comments.
+Thanks to Bas Westerbaan, Alicja Kario, Ilari Liusvaara, Dan Wing, Yaron Sheffer, Samuel Lee, Eric Rescorla, and Sean Turner for the discussion and comments.
