@@ -121,23 +121,24 @@ enum {
   mldsa65_ecdsa_secp256r1_sha512 (TBD2), 
   mldsa65_ecdsa_secp384r1_sha512 (TBD3), 
   mldsa87_ecdsa_secp384r1_sha512 (TBD4), 
+  mldsa87_ecdsa_secp521r1_sha512 (TBD5), 
 
   /* EdDSA-based Composite */
-  mldsa44_ed25519_sha512 (TBD5),
-  mldsa65_ed25519_sha512 (TBD6),
-  mldsa87_ed448_shake256 (TBD7),
+  mldsa44_ed25519_sha512 (TBD6),
+  mldsa65_ed25519_sha512 (TBD7),
+  mldsa87_ed448_shake256 (TBD8),
 
   /* RSA-PKCS1-based Composite (for signature_algorithms_cert ONLY) */
-  mldsa44_rsa2048_pkcs15_sha256 (TBD8),
-  mldsa65_rsa3072_pkcs15_sha512 (TBD9),
-  mldsa65_rsa4096_pkcs15_sha512 (TBD10),
+  mldsa44_rsa2048_pkcs15_sha256 (TBD9),
+  mldsa65_rsa3072_pkcs15_sha512 (TBD10),
+  mldsa65_rsa4096_pkcs15_sha512 (TBD11),
 
   /* RSA-PSS-based Composite */
-  mldsa44_rsa2048_pss_sha256 (TBD11),
-  mldsa65_rsa3072_pss_sha512 (TBD12),
-  mldsa87_rsa3072_pss_sha512 (TBD13), 
-  mldsa65_rsa4096_pss_sha512 (TBD14), 
-  mldsa87_rsa4096_pss_sha512 (TBD15)  
+  mldsa44_rsa2048_pss_sha256 (TBD12),
+  mldsa65_rsa3072_pss_sha512 (TBD13),
+  mldsa87_rsa3072_pss_sha512 (TBD14), 
+  mldsa65_rsa4096_pss_sha512 (TBD15), 
+  mldsa87_rsa4096_pss_sha512 (TBD16)  
   
 } SignatureScheme;
 
@@ -202,6 +203,7 @@ algorithm identifiers defined in {{I-D.ietf-lamps-pq-composite-sigs}}.
 | mldsa65_ecdsa_secp256r1_sha512 | id-MLDSA65-ECDSA-P256-SHA512              |
 | mldsa65_ecdsa_secp384r1_sha512 | id-MLDSA65-ECDSA-P384-SHA512              |
 | mldsa87_ecdsa_secp384r1_sha512 | id-MLDSA87-ECDSA-P384-SHA512              |
+| mldsa87_ecdsa_secp521r1_sha512 | id-MLDSA87-ECDSA-P521-SHA512              |
 | mldsa44_ed25519_sha512         | id-MLDSA44-Ed25519-SHA512                 |
 | mldsa65_ed25519_sha512         | id-MLDSA65-Ed25519-SHA512                 |
 | mldsa87_ed448_shake256         | id-MLDSA87-Ed448-SHAKE256                 |
@@ -244,17 +246,18 @@ according to the procedures in {{Section 6 of TLSIANA}}.
 | TBD2   | mldsa65_ecdsa_secp256r1_sha512           | N           | This document. |
 | TBD3   | mldsa65_ecdsa_secp384r1_sha512           | N           | This document. |
 | TBD4   | mldsa87_ecdsa_secp384r1_sha512           | N           | This document. |
-| TBD5   | mldsa44_ed25519_sha512                   | N           | This document. |
-| TBD6   | mldsa65_ed25519_sha512                   | N           | This document. |
-| TBD7   | mldsa87_ed448_shake256                   | N           | This document. |
-| TBD8   | mldsa44_rsa2048_pkcs15_sha256            | N           | This document. |
-| TBD9   | mldsa65_rsa3072_pkcs15_sha512            | N           | This document. |
-| TBD10  | mldsa65_rsa4096_pkcs15_sha512            | N           | This document. |
-| TBD11  | mldsa44_rsa2048_pss_sha256               | N           | This document. |
-| TBD12  | mldsa65_rsa3072_pss_sha512               | N           | This document. |
-| TBD13  | mldsa87_rsa3072_pss_sha512               | N           | This document. |
-| TBD14  | mldsa65_rsa4096_pss_sha512               | N           | This document. |
-| TBD15  | mldsa87_rsa4096_pss_sha512               | N           | This document. |
+| TBD5   | mldsa87_ecdsa_secp521r1_sha512           | N           | This document. |
+| TBD6   | mldsa44_ed25519_sha512                   | N           | This document. |
+| TBD7   | mldsa65_ed25519_sha512                   | N           | This document. |
+| TBD8   | mldsa87_ed448_shake256                   | N           | This document. |
+| TBD9   | mldsa44_rsa2048_pkcs15_sha256            | N           | This document. |
+| TBD10  | mldsa65_rsa3072_pkcs15_sha512            | N           | This document. |
+| TBD11  | mldsa65_rsa4096_pkcs15_sha512            | N           | This document. |
+| TBD12  | mldsa44_rsa2048_pss_sha256               | N           | This document. |
+| TBD13  | mldsa65_rsa3072_pss_sha512               | N           | This document. |
+| TBD14  | mldsa87_rsa3072_pss_sha512               | N           | This document. |
+| TBD15  | mldsa65_rsa4096_pss_sha512               | N           | This document. |
+| TBD16  | mldsa87_rsa4096_pss_sha512               | N           | This document. |
 
 ## Restricting Composite Signature Algorithms to the signature_algorithms_cert Extension
 
